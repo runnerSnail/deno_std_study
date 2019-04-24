@@ -1,58 +1,62 @@
-import { serve } from "../http/serve";
-import { compose } from './compose';
+import { serve, ServerRequest } from "../http/server.ts";
+import { compose } from './compose.ts';
 const exit = Deno.exit;
-class Application {
+export default class Application {
+  private _middlewares: Function[];
 
-    private _middlewares: Function[];
-    private _server?: Server;
-  
-    constructor() {
-      this._middlewares = [];
-    }
-  
-    /**
-     * 注册使用中间件
-     * @param fn {Function}
-     */
-    public use(fn: Function): void {
-      this._middlewares.push(fn);
-    }
-  
-    /**
-     * 开始监听服务
-     * @param addr {string} 监听地址和端口 0.0.0.0:0000
-     * @param fn {Function} 监听执行后的回调
-     */
-    public async listen(addr: string, fn?: Function) {
-        const that = this;
-        const server = new server(addr);
-        for await (const req of s) {
-            try {
-                req.respond({ body: new TextEncoder().encode("Hello World\n") });
-            } catch (error) {
-                this._onError(error,req)
-            }
-            
-        }
-        // 启动HTTP服务
-        if(fn && typeof fn === 'function'){
-            fn();
-        }
-    }
-  
-    /**
-     * 统一错误处理
-     * @param err {Error} 错误对象
-     * @param ctx {SafeContext} 当前HTTP上下文
-     */
-    private async _onError(err: Error, req: ServerRequest) {
-      console.log(err);
-      if (req instanceof ServerRequest) {
-        req.respond({ body: new TextEncoder().encode(err.stack),status:500});
-      } else {
-        exit(1);
-      }
-    }
+  constructor() {
+    this._middlewares = [];
   }
 
-export { Application };
+  /**
+   * 注册使用中间件
+   * @param fn {Function}
+   */
+  public use(fn: Function): void {
+    this._middlewares.push(fn);
+  }
+
+  /**
+   * 开始监听服务
+   * @param addr {string} 监听地址和端口 0.0.0.0:0000
+   * @param fn {Function} 监听执行后的回调
+   */
+  public listen(addr: string, fn?: Function) {
+    this.createServer(addr);
+    // 启动HTTP服务
+    if (fn && typeof fn === 'function') {
+      fn();
+    }
+  }
+  /**
+   * createServer
+   */
+  public async createServer(addr: string) {
+    const server = serve(addr);
+    for await (const req of server) {
+      try {
+        // 等待执行所有中间件
+        const fn = compose(this._middlewares);
+        fn(req).then().catch((e) => {
+          this._onError(e, req)
+        });
+      } catch (error) {
+        this._onError(error, req)
+      }
+
+    }
+  }
+  /**
+   * 统一错误处理
+   * @param err {Error} 错误对象
+   * @param ctx {SafeContext} 当前HTTP上下文
+   */
+  private async _onError(err: Error, req: ServerRequest) {
+    console.log(err);
+    if (req instanceof ServerRequest) {
+      req.respond({ body: new TextEncoder().encode(err.stack), status: 500 });
+    } else {
+      exit(1);
+    }
+  }
+}
