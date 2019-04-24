@@ -5,7 +5,7 @@
 ## useinfo
 
 ```typescript
-const app = new Application();
+const app = new Onion();
 app.use(async (req, next) => {
     console.log(1);
     await next();
