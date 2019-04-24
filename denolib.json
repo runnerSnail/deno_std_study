@@ -1,0 +1,9 @@
+{
+  "name": "onion",
+  "author": "哇牛",
+  "keywords": [
+    "http",
+    "framework"
+  ],
+  "entry": "mod.ts"
+}

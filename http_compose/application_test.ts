@@ -1,5 +1,5 @@
-import Application from './application.ts';
-const app = new Application();
+import Onion from './onion.ts';
+const app = new Onion();
 app.use(async (req, next) => {
     console.log(1);
     await next();

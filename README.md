@@ -1,40 +1,24 @@
-# Deno Standard Modules
+## http-compose
 
-[![Build Status](https://dev.azure.com/denoland/deno_std/_apis/build/status/denoland.deno_std?branchName=master)](https://dev.azure.com/denoland/deno_std/_build/latest?definitionId=2?branchName=master)
+> Depending on deno_std
 
-These modules do not have external dependencies and they are reviewed by the
-Deno core team. The intention is to have a standard set of high quality code
-that all Deno projects can use fearlessly.
+## useinfo
 
-Contributions are welcome!
+````typescript
+const app = new Application();
+app.use(async (req, next) => {
+    console.log(1);
+    await next();
+    console.log(4);
+    req.respond({ body: new TextEncoder().encode("Hello World\n") });
+})
 
-## How to use
-
-These modules are tagged in accordance with Deno releases. So, for example, the
-v0.3.0 tag is guaranteed to work with deno v0.3.0.
-You can link to v0.3.0 using the URL `https://deno.land/std@v0.3.0/`
-
-It's strongly recommended that you link to tagged releases rather than the
-master branch. The project is still young and we expect disruptive renames in
-the future.
-
-## Documentation
-
-Here are the dedicated documentations of modules:
-
-- [colors](colors/README.md)
-- [datetime](datetime/README.md)
-- [examples](examples/README.md)
-- [flags](flags/README.md)
-- [fs](fs/README.md)
-- [http](http/README.md)
-- [log](log/README.md)
-- [media_types](media_types/README.md)
-- [prettier](prettier/README.md)
-- [strings](strings/README.md)
-- [testing](testing/README.md)
-- [toml](toml/README.md)
-
-## Contributing
-
-Follow the [style guide](https://deno.land/style_guide.html).
+app.use(async (req, next) => {
+    console.log(2);
+    await next();
+    console.log(3);
+})
+app.listen('127.0.0.1:8000', () => {
+    console.log(`启动：127.0.0.1:8000`)
+})```
+````
