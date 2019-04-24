@@ -1,6 +1,6 @@
 ## http-compose
 
-> Depending on deno_std
+> Depending on deno_std http package
 
 ## useinfo
 
